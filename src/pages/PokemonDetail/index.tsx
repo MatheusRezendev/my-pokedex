@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { 
+  View, 
+  Text, 
+  Image, 
+  ScrollView, 
+  ActivityIndicator, 
+  TouchableOpacity, 
+  Share 
+} from 'react-native';
 import { createStyles } from './styles';
 import { useTheme } from '../../global/themes';
 import { useRoute } from '@react-navigation/native';
@@ -76,7 +84,6 @@ export default function PokemonDetailScreen() {
    return null;
  }
 
-
  async function handleToggleFavorite() {
    if (!pokemon) return;
    const summary = {
@@ -89,6 +96,40 @@ export default function PokemonDetailScreen() {
    };
    const updated = await toggleFavorite(summary);
    setFavorite(updated.some((item) => item.id === pokemon.id));
+ }
+
+ async function handleSharePokemon() {
+    if (!pokemon) return;
+
+    const message_stats = {
+      name: pokemon.name,
+      id: pokemon.id,
+      types: pokemon.types.map((t) => t.type.name).join(', '),
+      height: pokemon.height / 10,
+      weight: pokemon.weight / 10
+    }
+
+    const pokeApiUrl = `https://www.pokemon.com/br/pokedex/${pokemon.id}/`;
+    const message = `Olha esse Pokémon na Pokédex: {${message_stats.name}, ${message_stats.types}, ${message_stats.height}, ${message_stats.weight}} (#${String(message_stats.id).padStart(3, '0')})\n${pokeApiUrl}`;
+
+    try {
+      const result = await Share.share(
+        {
+          message,
+          title: `Pokémon: ${pokemon.name}`,
+        },
+        { subject: `Pokémon: ${pokemon.name}` },
+      );
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+        }
+      } 
+      else if (result.action === Share.dismissedAction) {
+      }
+    } catch (error) {
+      console.warn('Erro ao compartilhar:', error);
+    }
  }
 
  useEffect(() => {
@@ -199,24 +240,39 @@ export default function PokemonDetailScreen() {
          (<Image source={{ uri: pokemon.sprites.front_default }} style={styles.image} />) :
          null}
      </View>
-    
-     <TouchableOpacity
-       onPress={handleToggleFavorite}
-       disabled={favoriteLoading}
-       style={{
-         backgroundColor: favorite ? '#FFCB05' : '#E5E7EB',
-         paddingHorizontal: 16,
-         paddingVertical: 10,
-         borderRadius: 999,
-         alignSelf: 'flex-start',
-         marginBottom: 16,
-       }}
-     >
-       <Text style={{ fontWeight: '700', color: '#111827' }}>
-         {favorite ? '★ Favorito' : '☆ Favoritar'}
-       </Text>
-     </TouchableOpacity>
+        
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+      <TouchableOpacity
+        onPress={handleToggleFavorite}
+        disabled={favoriteLoading}
+        style={{
+          backgroundColor: favorite ? '#FFCB05' : '#E5E7EB',
+          paddingHorizontal: 16,
+          paddingVertical: 10,
+          borderRadius: 999,
+          alignSelf: 'flex-start',
+          marginBottom: 16,
+        }}
+        >
+          <Text style={{ fontWeight: '700', color: '#111827' }}>
+            {favorite ? '★ Favorito' : '☆ Favoritar'}
+          </Text>
+        </TouchableOpacity>
 
+        <TouchableOpacity
+          onPress={handleSharePokemon}
+          style={{
+            backgroundColor: '#2563eb',
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            borderRadius: 999,
+            marginBottom: 16,
+            alignItems: 'flex-end',
+          }}
+          >
+          <Text style={{ fontWeight: '700', color: '#fff' }}>Compartilhar</Text>
+        </TouchableOpacity>
+      </View>
 
      <View style={styles.section}>
        <Text style={styles.sectionTitle}>Sobre</Text>
