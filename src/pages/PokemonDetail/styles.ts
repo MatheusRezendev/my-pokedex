@@ -95,5 +95,13 @@ export const createStyles = (theme: Theme) =>
       fontWeight: '600',
       color: theme.colors.text,
     },
+    capturedPhoto: {
+      width: '100%',
+      bottom: 15,
+      height: 220,
+      borderRadius: 16,
+      marginTop: 16,
+      resizeMode: 'cover',
+    },
   });
 

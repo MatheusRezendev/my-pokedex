@@ -76,5 +76,8 @@ export const createStyles = (theme: Theme) =>
       color: theme.colors.text,
       fontWeight: 'bold',
     },
+    buttonEntrarDisabled: {
+      opacity: 0.4,
+    },
   });
 
