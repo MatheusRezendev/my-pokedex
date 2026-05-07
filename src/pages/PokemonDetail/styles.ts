@@ -44,9 +44,9 @@ export const createStyles = (theme: Theme) =>
     },
     typeText: {
       fontSize: 12,
-      fontWeight: '600',
+      fontWeight: '700',
       textTransform: 'capitalize',
-      color: theme.colors.text,
+      color: '#fff',
     },
     image: {
       width: 160,

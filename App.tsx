@@ -6,6 +6,11 @@ import PokemonListScreen from './src/pages/PokemonList';
 import PokemonDetailScreen from './src/pages/PokemonDetail';
 import AppNavigator from './src/routes';
 import { NavigationContainer } from '@react-navigation/native';
+import { initDatabase } from './src/database/init';
+import { seedUser } from './src/database/seedUser';
+
+initDatabase();
+seedUser();
 
 export default function App() {
   return (

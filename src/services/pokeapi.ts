@@ -23,7 +23,7 @@ export async function fetchPokemonList(
   const response = await fetch(url, { signal: options?.signal });
 
   if (!response.ok) {
-    throw new Error('Falha ao buscar lista de Pokémon');
+    throw new Error('Falha ao buscar lista de Pokemon');
   }
 
   return response.json();
@@ -33,15 +33,23 @@ export type PokemonListItemUI = {
   id: number;
   name: string;
   imageUrl: string;
+  types: string[];
 };
 
-function extractIdPokemon(url: string): number {
-  const parts = url.split('/').filter(Boolean);
-  return Number(parts[parts.length - 1]);
-}
+type PokemonDetailListItemResponse = {
+  id: number;
+  name: string;
+  types: {
+    slot: number;
+    type: {
+      name: string;
+      url: string;
+    };
+  }[];
+};
 
 export async function fetchPokemonListPage(
-  limit = 10,
+  limit = 20,
   offset = 0,
   options?: FetchOptions,
 ): Promise<{
@@ -49,16 +57,23 @@ export async function fetchPokemonListPage(
   count: number;
   next: string | null;
 }> {
-  const data = await fetchPokemonList(limit, offset, options); 
+  const data = await fetchPokemonList(limit, offset, options);
+  const details = await Promise.all(
+    data.results.map(async (pokemon) => {
+      const response = await fetch(pokemon.url, { signal: options?.signal });
+      if (!response.ok) {
+        throw new Error(`Falha ao buscar detalhes de ${pokemon.name}`);
+      }
+      return (await response.json()) as PokemonDetailListItemResponse;
+    }),
+  );
 
-  const items = data.results.map((pokemon) => {
-    const id = extractIdPokemon(pokemon.url);
-    return {
-      id,
-      name: pokemon.name,
-      imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
-    }
-  })
+  const items = details.map((detail) => ({
+    id: detail.id,
+    name: detail.name,
+    imageUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${detail.id}.png`,
+    types: detail.types.map((item) => item.type.name),
+  }));
 
   return {
     items,
@@ -103,7 +118,7 @@ export async function fetchPokemonDetail(
   const response = await fetch(url, { signal: options?.signal });
 
   if (!response.ok) {
-    throw new Error('Falha ao buscar detalhes do Pokémon');
+    throw new Error('Falha ao buscar detalhes do Pokemon');
   }
 
   return response.json();
@@ -131,7 +146,7 @@ export async function fetchPokemonSpecies(
   const response = await fetch(url, { signal: options?.signal });
 
   if (!response.ok) {
-    throw new Error('Falha ao buscar descrição do Pokémon');
+    throw new Error('Falha ao buscar descricao do Pokemon');
   }
 
   return response.json();
