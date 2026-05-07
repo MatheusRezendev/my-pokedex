@@ -3,6 +3,9 @@
     "name": "my-pokedex",
     "slug": "my-pokedex",
     "version": "1.0.0",
+    "plugins": [
+      "expo-sqlite"
+    ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
