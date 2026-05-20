@@ -15,6 +15,7 @@ import {
 import { isFavorite, toggleFavorite } from '../../services/favoritesStorage';
 import { saveLastViewedPokemon } from '../../services/lastPokemonViewed';
 import { getPokemonPhoto } from '../../services/pokemonPhotoMemory';
+import { notifyPokemonFavorited, scheduleQuickReminder } from '../../services/localNotifications';
 
 const TYPE_COLORS: Record<string, string> = {
   normal: '#A8A77A',
@@ -87,8 +88,19 @@ export default function PokemonDetailScreen() {
         `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`,
       types: pokemon.types.map((item) => item.type.name),
     };
+
     const updated = await toggleFavorite(summary);
+    const isNowFavorite = updated.some((item) => item.id === pokemon.id)
+
     setFavorite(updated.some((item) => item.id === pokemon.id));
+
+    if(isNowFavorite) {
+      await notifyPokemonFavorited(pokemon.name);
+    }
+  }
+
+  async function scheduleReminder() {
+    await scheduleQuickReminder(10);
   }
 
   async function handleSharePokemon() {
@@ -215,47 +227,39 @@ export default function PokemonDetailScreen() {
         ) : null}
       </View>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8, width: '100%' }}>
+      <View style={styles.actionGrid}>
         <TouchableOpacity
           onPress={handleToggleFavorite}
           disabled={favoriteLoading}
-          style={{
-            backgroundColor: favorite ? '#FFCB05' : '#E5E7EB',
-            paddingHorizontal: 16,
-            paddingVertical: 10,
-            borderRadius: 999,
-            marginBottom: 16,
-          }}
+          style={[
+            styles.actionButton,
+            { backgroundColor: favorite ? '#FFCB05' : '#E5E7EB' },
+          ]}
         >
-          <Text style={{ fontWeight: '700', color: '#111827' }}>
+          <Text style={[styles.actionButtonText, { color: '#111827' }]}>
             {favorite ? '* Favorito' : 'Favoritar'}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
+          onPress={scheduleReminder}
+          style={[styles.actionButton, { backgroundColor: '#503514' }]}
+         >
+          <Text style={[styles.actionButtonText, { color: '#fff' }]}>Lembrar em 10s</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           onPress={handleSharePokemon}
-          style={{
-            backgroundColor: '#2563eb',
-            paddingHorizontal: 16,
-            paddingVertical: 10,
-            borderRadius: 999,
-            marginBottom: 16,
-          }}
+          style={[styles.actionButton, { backgroundColor: '#2563eb' }]}
         >
-          <Text style={{ fontWeight: '700', color: '#fff' }}>Compartilhar</Text>
+          <Text style={[styles.actionButtonText, { color: '#fff' }]}>Compartilhar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={handleOpenCamera}
-          style={{
-            backgroundColor: '#16a34a',
-            paddingHorizontal: 16,
-            paddingVertical: 10,
-            borderRadius: 999,
-            marginBottom: 16,
-          }}
+          style={[styles.actionButton, { backgroundColor: '#16a34a' }]}
         >
-          <Text style={{ fontWeight: '700', color: '#fff' }}>Camera</Text>
+          <Text style={[styles.actionButtonText, { color: '#fff' }]}>Camera</Text>
         </TouchableOpacity>
       </View>
 

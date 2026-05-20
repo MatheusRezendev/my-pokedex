@@ -103,5 +103,24 @@ export const createStyles = (theme: Theme) =>
       marginTop: 16,
       resizeMode: 'cover',
     },
+    actionGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      rowGap: 12,
+      marginBottom: 16,
+    },
+    actionButton: {
+      width: '48%',
+      minHeight: 44,
+      borderRadius: 999,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    actionButtonText: {
+      fontWeight: '700',
+    },
   });
 
